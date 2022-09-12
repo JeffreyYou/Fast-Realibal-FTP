@@ -8,7 +8,7 @@
 
 文字：
 
-[c/c++实现ftp客户端源码](https://www.sindsun.com/articles/16/137)
+[C/C++实现ftp客户端源码](https://www.sindsun.com/articles/16/137)
 
 [C++的简单FTP客户端实现（一）FTP基础知识](https://blog.csdn.net/xuruilll/article/details/122763005)
 
