@@ -18,9 +18,7 @@ GitHub项目
 
 [C/C++实现ftp客户端源码](https://www.sindsun.com/articles/16/137)
 
-[C++的简单FTP客户端实现（一）FTP基础知识](https://blog.csdn.net/xuruilll/article/details/122763005)
-
-[C++的简单FTP客户端实现（二）编程](https://blog.csdn.net/xuruilll/article/details/122763022)
+[C++的简单FTP客户端实现](https://blog.csdn.net/xuruilll/article/details/122763005)
 
 视频教程
 
