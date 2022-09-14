@@ -25,3 +25,11 @@ GitHub项目
 视频教程
 
 [【C/C++项目开发】使用FTP传输文件到服务器，实现简单通信](https://www.bilibili.com/video/BV1HA411N7Q7?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=36f6248a8f8f91f7f222d6009428db8c)
+
+## 2. FTP Server
+
+[server.c](https://github.com/thevickypedia/ftp_server_client/blob/master/server.c)
+
+## 3. FTP Client
+
+[client.c](https://github.com/thevickypedia/ftp_server_client/blob/master/client.c)
