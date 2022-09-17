@@ -1,11 +1,14 @@
 
+void send_FTP(char* file_name){
+	//send to client
+}
 
 // Handle the Client
 void clientHandle(int client_socket){
 
 	char client_buffer[BUFSIZ];
 	char server_buffer[BUFSIZ];
-	char file_buffer[BUFSIZ];
+	char file_name[BUFSIZ];
 
 	while(1){
 		bzero(client_buffer, sizeof(client_buffer));
@@ -18,6 +21,7 @@ void clientHandle(int client_socket){
 		if(client_buffer[0] == 'g' && client_buffer[0] == 'e' && client_buffer[0] == 't'){
 			int *p = strchr(client_buffer, ' ') + 1;
 			strcpy(file_buffer, p);
+			send_FTP(file_name);
 		}
 	}
 
