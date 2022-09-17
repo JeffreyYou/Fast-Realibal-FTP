@@ -13,8 +13,6 @@ char buf[100];
 
 int send_FTP(char* file_name, int client_socket, sockaddr_in client_address){
 	//send to client
-	cout << file_name <<endl;
-	cout <<  sizeof(file_name) <<endl;
 	int n = sendto(client_socket, file_name, strlen(file_name), 0,(struct sockaddr*)&client_address, sizeof(client_address));
 	
 

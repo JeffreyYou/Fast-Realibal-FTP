@@ -7,15 +7,9 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <sys/wait.h>
 
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <vector>
-#include <algorithm>
-#include <map>
 #include <fstream>
 using namespace std;
 
@@ -43,7 +37,6 @@ int main(int argc, char const *argv[]){
     if(numbytes < 0){
         cout<<"sendto error"<<endl;
     }
-    cout << "port: "<<ntohs(client_send_address.sin_port) <<endl;
     while(1){
         numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
         if(numbytes > 0){
