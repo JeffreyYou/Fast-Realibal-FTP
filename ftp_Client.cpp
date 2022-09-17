@@ -35,18 +35,22 @@ int main(int argc, char const *argv[]){
 
     client_send_address.sin_family = AF_INET;
     client_send_address.sin_port = htons(SERVER_PORT);//9999
-    inet_pton(AF_INET, "127.0.0.1", &client_send_address.sin_addr); 
+    client_send_address.sin_addr.s_addr = INADDR_ANY;
+    //inet_pton(AF_INET, "127.0.0.1", &client_send_address.sin_addr); 
  
 
     int numbytes = sendto(server_sockfd, send_buffer, sizeof(send_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
     if(numbytes < 0){
         cout<<"sendto error"<<endl;
     }
-
-    numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
-    if(numbytes < 0){
-        cout<<"recvfrom error"<<endl;
+    cout << "port: "<<ntohs(client_send_address.sin_port) <<endl;
+    while(1){
+        numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
+        if(numbytes > 0){
+            break;
+        }
     }
+    
 
     cout<< recv_buffer << endl;
     close(server_sockfd);

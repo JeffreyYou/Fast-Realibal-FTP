@@ -13,11 +13,14 @@ char buf[100];
 
 int send_FTP(char* file_name, int client_socket, sockaddr_in client_address){
 	//send to client
-	int n = sendto(client_socket, file_name, sizeof(file_name), 0,(struct sockaddr*)&client_address, sizeof(client_address));
+	cout << file_name <<endl;
+	cout <<  sizeof(file_name) <<endl;
+	int n = sendto(client_socket, file_name, strlen(file_name), 0,(struct sockaddr*)&client_address, sizeof(client_address));
 	
 
 	if(n<0){
-		printf("Server failed to connect client");
+		cout<< "Server failed to connect client" <<endl;
+		
 	}
 	close(client_socket);
 	return 0;
@@ -87,7 +90,7 @@ int main(int argc, char const *argv[])
 	recvfrom(server_socket, buf, 99, 0, (struct sockaddr *)&client_address, &client_length);
 	cout << buf << endl;
 
-	clientHandle(client_socket, client_address);
+	clientHandle(server_socket, client_address);
 	// while(isError = recvfrom(server_socket, buf, 99, 0, (struct sockaddr *)&client_address, &client_length))
 	// 	{
 
