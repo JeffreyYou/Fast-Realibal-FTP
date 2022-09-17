@@ -1,10 +1,20 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
 
-void send_FTP(char* file_name){
+
+int send_FTP(char* file_name, int client_socket){
 	//send to client
+	int n = send(client_socket, file_name, sizeof(file_name), 0);
+	if(n<0){
+		printf("Server failed to connect client");
+	}
+	close(client_socket);
+	return 0;
 }
 
 // Handle the Client
-void clientHandle(int client_socket){
+int clientHandle(int client_socket){
 
 	char client_buffer[BUFSIZ];
 	char server_buffer[BUFSIZ];
@@ -19,11 +29,14 @@ void clientHandle(int client_socket){
 		}
 
 		if(client_buffer[0] == 'g' && client_buffer[0] == 'e' && client_buffer[0] == 't'){
-			int *p = strchr(client_buffer, ' ') + 1;
-			strcpy(file_buffer, p);
-			send_FTP(file_name);
+			char *p = strchr(client_buffer, ' ');
+			
+			strcpy(file_name, p);
+			send_FTP(file_name, client_socket);
 		}
+		
+		pthread_exit(NULL);
 	}
 
-	return;
+	return 0;
 }
