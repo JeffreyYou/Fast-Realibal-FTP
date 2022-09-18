@@ -1,10 +1,10 @@
 all: server client
 
 server: 
-	g++ -std=c++11 -o server UDPserver.cpp 
+	g++ -pthread -std=c++11 -o server server.cpp 
 
 client:
-	g++ -std=c++11 -o client UDPclient.cpp
+	g++ -pthread -std=c++1 client client.cpp
 
 clean:
 	rm server client
