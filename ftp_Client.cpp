@@ -18,8 +18,9 @@ using namespace std;
 
 int main(int argc, char const *argv[]){
 
-    char send_buffer[] = "get /ect/network/interfaces";
-    char recv_buffer[100];
+    char send_buffer[] = "get ./data.txt";
+    char recv_buffer[BUFSIZ];
+    memset(recv_buffer, 0, sizeof(recv_buffer));
 
     struct sockaddr_in client_recv_address, client_send_address;
 
@@ -37,15 +38,19 @@ int main(int argc, char const *argv[]){
     if(numbytes < 0){
         cout<<"sendto error"<<endl;
     }
-    while(1){
-        numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
-        if(numbytes > 0){
-            break;
-        }
-    }
-    
 
-    cout<< recv_buffer << endl;
+    //recv file name
+    numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
+    cout<<"the name of the file: \""<< recv_buffer <<"\""<< endl;
+    //create file
+    //ofstream create_file("data_client.txt");
+    //create_file.close();
+    
+    memset(recv_buffer, 0, sizeof(recv_buffer));
+    numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
+    cout<<"the total packet to be sent: \""<< recv_buffer <<"\""<< endl;
+
+    cout<<"Server starts sending file \""<< recv_buffer <<"\""<< endl;
     close(server_sockfd);
 
     return 0;

@@ -1,6 +1,6 @@
 all:	Server Client
 
 Server: 
-		g++ -pthread ftp_Server.cpp -o ftp_Server
+		g++ -pthread ftp_Server.cpp -o server
 Client:
-		g++ -pthread ftp_Client.cpp -o ftp_Client
+		g++ -pthread ftp_Client.cpp -o client
