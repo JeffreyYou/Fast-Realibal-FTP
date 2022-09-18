@@ -68,7 +68,7 @@ void UnloadThread(){
         // check if it is empty
         if(tkmap.empty()){
             minkey = 100000000;
-            mtx.unlock()
+            mtx.unlock();
             continue;
         }
         else{   
@@ -85,23 +85,23 @@ void UnloadThread(){
             }
             
             // if minkey is larger than currenttoken, continue
-            if(currenttoken < token){
+            if(currenttoken < minkey){
                 mtx.unlock();
                 usleep(RTT/10);
             } 
 
             // if minkey is equal to the currenttoken, add it to the file
             // update currenttoken, tokenlist, delete the pairs
-            if(currenttoken == token){
+            if(currenttoken == minkey){
                 if(out.is_open()){
-                    out << tkmap[token];
+                    out << tkmap[minkey];
                     out.flush();
                 }else{
                     cout << "Serious Error! Not opening" <<endl;
                 }
-                tokenlist[token] = true;
+                tokenlist[minkey] = true;
                 currenttoken ++;
-                map.remove(token);
+                tkmap.erase(minkey);
                 for(auto i : tkmap){
                     if(i.first < minkey){
                         minkey = i.first;
@@ -111,13 +111,7 @@ void UnloadThread(){
                 continue;
             }
         }
-    
-    
-    
-
-    
-    
-    
+    } 
 }
 
 void LoadThread(int token,string s){
