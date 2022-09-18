@@ -19,7 +19,7 @@ using namespace std;
 int main(int argc, char const *argv[]){
 
     char send_buffer[] = "get ./data.txt";
-    char recv_buffer[BUFSIZ];
+    char recv_buffer[2000];
     memset(recv_buffer, 0, sizeof(recv_buffer));
 
     struct sockaddr_in client_recv_address, client_send_address;
@@ -43,14 +43,34 @@ int main(int argc, char const *argv[]){
     numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
     cout<<"the name of the file: \""<< recv_buffer <<"\""<< endl;
     //create file
-    //ofstream create_file("data_client.txt");
-    //create_file.close();
+    ofstream create_file;
+    create_file.open("data_client.txt", ios::out | ios::trunc);
+    create_file.close();
     
     memset(recv_buffer, 0, sizeof(recv_buffer));
     numbytes = recvfrom(server_sockfd, recv_buffer, 100, 0, NULL, 0);
     cout<<"the total packet to be sent: \""<< recv_buffer <<"\""<< endl;
+    memset(recv_buffer, 0, sizeof(recv_buffer));
 
-    cout<<"Server starts sending file \""<< recv_buffer <<"\""<< endl;
+
+    int i = 27;
+    ofstream write_file;
+    write_file.open("./data_client.txt");
+    int token_num;
+    while(i>0){
+        numbytes = recvfrom(server_sockfd, recv_buffer, 2000, 0, NULL, 0);
+        token_num = 0;
+        for(int j =0;j<6;j++){
+            token_num = token_num * 10 + (recv_buffer[j]-'0');
+        }
+
+        cout<< "Receive packet: "<<token_num <<endl;
+        write_file<< recv_buffer+6;
+        memset(recv_buffer, 0, sizeof(recv_buffer));
+        i--;
+    }
+    write_file.close();
+    //cout<<"Server starts sending file \""<< recv_buffer <<"\""<< endl;
     close(server_sockfd);
 
     return 0;
