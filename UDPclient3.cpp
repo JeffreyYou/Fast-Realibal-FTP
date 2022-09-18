@@ -216,8 +216,11 @@ int main(int argc, char *argv[]){
 
         //create a writing thread
         thread load_thread(LoadThread,token,s);
-      
-    
-        
+
+        if(! notfinished){
+            string ask3 = "999999";
+            ask =  sendto(sck,ask1.c_str(),ask1.size()+1,0,(sockaddr*)&hintM,sizeof(hintM));
+            break;
+        }
     }
 }
