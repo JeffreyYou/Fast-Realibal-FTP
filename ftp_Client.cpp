@@ -13,7 +13,8 @@
 #include <thread>
 #include <fstream>
 #include <mutex>
-
+#include <arpa/inet.h>
+#include <condition_variable> 
 using namespace std;
 
 int server_sockfd;
@@ -61,6 +62,8 @@ int resend_packet(int number){
 int store_packet_in_map(){
         int before=0;
         int now=0;  
+	bool is_map_full = false;
+	int store_packet = 0;
 
         while(total_sotred_packet!=total_packetNum){
 
@@ -70,23 +73,37 @@ int store_packet_in_map(){
             for(int j =0;j<6;j++){
                 token_num = token_num * 10 + (recv_buffer[j]-'0');
             }
-            cout<<"store packet: "<<token_num<<endl;
+            //cout<<"recv packet: "<<token_num<<endl;
+	    //cout<<"map key: "<<token_num<<"value: "<<packet_map.count(token_num)<<endl;
             now = token_num;
-            if((now-before)>1){ //some packet lost
-                //resend before+1
+	    
+	    if(store_packet%290 == 0 && store_packet>0){
+		is_map_full = true;
+}
+	    if(is_map_full){
+		char ok_buffer[] = {'9','9','9','9','9','8','\0'};
+       		int c = sendto(server_sockfd, ok_buffer, strlen(ok_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
+		is_map_full = false;
+}
 
-                thread requset_packet(resend_packet,before+1);
-                //usleep();
+            // if((now-before)>1){ //some packet lost
+            //     //resend before+1
 
-            }
+            //     thread requset_packet(resend_packet,before+1);
+            //     //usleep();
+
+            // }
             if(check_p[token_num] == false){ //not flase means drop this packet
                 mtx.lock();
-                check_p[token_num] == true;
+                check_p[token_num] = true;
                 string str(recv_buffer);
                 pair<int,string> p(token_num, str);
                 packet_map.insert(p);
+                cout<<"store packet: "<<token_num<<endl;
+                //cout<<"map key: "<<token_num<<",value: "<<packet_map.count(token_num)<<endl;
                 total_sotred_packet++;
                 before = token_num;
+		store_packet++;
                 mtx.unlock();
             }
 
@@ -98,21 +115,35 @@ int write_packet_func(){
         write_file.open("./data_client.txt");
 
         while(current_token != total_packetNum){
+
             if(packet_map.count(current_token)>0){
                 memset(write_buffer, 0, sizeof(write_buffer));
 
+		strcpy(write_buffer, packet_map[current_token].c_str());
                 //write_buffer = packet_map[current_token].c_str();
                 write_file<< packet_map[current_token].substr(6);
-                mtx.lock();
+                
+		mtx.lock();
                 packet_map.erase(current_token);
                 mtx.unlock();
-                current_token++;
-            }else{
-                thread requset_packet(resend_packet,current_token);
 
+                cout<<"write packet: "<<current_token<<endl;
+                current_token++;
+
+            }
+	    else{
+                //thread requset_packet(resend_packet,current_token);
+                //requset_packet.join();
+                //usleep(100);
                 //resend
+		//if(packet_map.count(current_token+1)>0){
+                cout<<"resend: "<<current_token<<endl;
+                resend_packet(current_token);
+                usleep(10);
+		//}
             }
         }
+        isFinish = true;
         return 0;
 }
    
@@ -137,7 +168,7 @@ int write_packet_func(){
 
 int main(int argc, char const *argv[]){
 
-    char send_buffer[] = "get ./data.txt";
+    char send_buffer[] = "get ./data.bin";
     
 
     string fileName;
@@ -152,8 +183,8 @@ int main(int argc, char const *argv[]){
 
     client_send_address.sin_family = AF_INET;
     client_send_address.sin_port = htons(SERVER_PORT);//9999
-    client_send_address.sin_addr.s_addr = INADDR_ANY;
-    //inet_pton(AF_INET, "127.0.0.1", &client_send_address.sin_addr); 
+    //client_send_address.sin_addr.s_addr = INADDR_ANY;
+    inet_pton(AF_INET, "10.0.1.108", &client_send_address.sin_addr); 
  
 
     int numbytes = sendto(server_sockfd, send_buffer, sizeof(send_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
@@ -169,7 +200,7 @@ int main(int argc, char const *argv[]){
     cout<<"the name of the file: \""<< fileName <<"\""<< endl;
     //create file
     ofstream create_file;
-    create_file.open("data_client.txt", ios::out | ios::trunc);
+    create_file.open(fileName, ios::out | ios::trunc);
     create_file.close();
     
     memset(packet_num, 0, sizeof(packet_num));
@@ -180,8 +211,8 @@ int main(int argc, char const *argv[]){
     }
     cout<<"the total packet to be sent: \""<< total_packetNum <<"\""<< endl;
 
-    bool recv_check[packetNum];
-    for(int i = 0;i<packetNum;i++){
+    bool recv_check[total_packetNum];
+    for(int i = 0;i<total_packetNum;i++){
         recv_check[i] = false;
     }
     check_p = recv_check;
@@ -191,7 +222,17 @@ int main(int argc, char const *argv[]){
 
     store_packet.join();
     write_packet.join();
+    char finish_buffer[] = {'9','9','9','9','9','9','\0'};
+    cout<<"finish_buffer: "<< finish_buffer << endl;
+
+    if(isFinish){
+       int c = sendto(server_sockfd, finish_buffer, strlen(finish_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
+        if(c<0){
+        cout<<"send fail"<<endl;
+        }
+    }
     close(server_sockfd);
+    
     return 0;
 
 }
@@ -199,5 +240,5 @@ int main(int argc, char const *argv[]){
 // void ClientHandler(string s){
 //     out.open("myfile.txt", ios::app);
 //     out << str;
-// }
+// 
 

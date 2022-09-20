@@ -1,7 +1,7 @@
 import hashlib
 
 str2hash = ""
-f = open("a.txt","r")
+f = open("data1.bin","r")
 lines = f.readlines()
 
 for i in lines:
@@ -9,5 +9,5 @@ for i in lines:
   
 result = hashlib.md5(str2hash.encode())
   
-print("The hexadecimal equivalent of hash is : ", end ="")
+print("The hexadecimal equivalent of hash is : ")
 print(result.hexdigest())

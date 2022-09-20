@@ -2,9 +2,9 @@ all:	clear Server Client run
 clear:
 		clear
 Server: 
-		g++ -pthread ftp_Server.cpp -o server
+		g++ -std=c++11 -g -pthread ftp_Server.cpp -o server
 Client:
-		g++ -pthread ftp_Client.cpp -o client
+		g++ -std=c++11 -g -pthread ftp_Client.cpp -o client
 
 run:	
 		./server
