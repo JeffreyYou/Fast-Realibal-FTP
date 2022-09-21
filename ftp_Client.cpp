@@ -96,9 +96,13 @@ int store_packet_in_map(){
             int token_num;
 
             //cout<<"before recv: "<< token_num<<endl;
-            //memset(recv_buffer, 0, sizeof(recv_buffer));
-            bzero(recv_buffer, sizeof(recv_buffer));
-            int numbytes = recvfrom(server_sockfd, recv_buffer, 1500, 0, NULL, 0);
+            memset(recv_buffer, 0, 1472);
+           // bzero(recv_buffer, sizeof(recv_buffer));
+
+            int numbytes = recvfrom(server_sockfd, recv_buffer, 1472, 0, NULL, 0);
+	   // cout<<"numbytes: "<<numbytes<<endl;
+	    cout<<" recv_buffer: "<<endl<< recv_buffer<<endl;
+	   // cout<<"recv_buffer_size: "<<sizeof(recv_buffer)<<endl;
             token_num = 0;
             for(int j =0;j<6;j++){
                 token_num = token_num * 10 + (recv_buffer[j]-'0');
@@ -106,9 +110,15 @@ int store_packet_in_map(){
 
             //number_store = token_num;
 
+
+
             if((total_sotred_packet%300 == 0) && total_sotred_packet>0){
     		      is_map_full = true;
             }
+	    if(packet_map.size()>500000){
+	 	      is_map_full = false;
+	    }
+	   
     	    if(is_map_full){
     		      char ok_buffer[] = {'9','9','9','9','9','8','\0'};
            		  int c = sendto(server_sockfd, ok_buffer, strlen(ok_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
@@ -133,7 +143,7 @@ int store_packet_in_map(){
                 total_sotred_packet++;
 
                 mtx.unlock();
-
+		//delete ptr;
                // cout<<"map key: "<<token_num<<",value: "<<packet_map.count(token_num)<<endl;
                 
 
@@ -148,8 +158,8 @@ int store_packet_in_map(){
 // -----------------------Write---------------------------
 int write_packet_func(){
         ofstream write_file;
-        //write_file.open("./test.txt", ios::binary | ios::out);
-        write_file.open("./data1.bin", ios::binary | ios::out);
+        write_file.open("./test.txt", ios::binary | ios::out);
+       // write_file.open("./data.bin", ios::binary | ios::out);
 
 
         while(current_token != total_packetNum){
@@ -164,19 +174,25 @@ int write_packet_func(){
 
                 //write_file<< packet_map[current_token]+6;
                 if(current_token != (total_packetNum-1)){
+		cout<<"write: "<<packet_map[current_token]<<endl;
+		cout<<"write+6: "<<packet_map[current_token]+6<<endl;
                     write_file.write(packet_map[current_token]+6, 1466);
                 }else{
+		cout<<"write: "<<packet_map[current_token]<<endl;
+                cout<<"write+6: "<<packet_map[current_token]+6<<endl;
                     write_file.write(packet_map[current_token]+6, total_packetSize-(total_packetNum-1)*1466);
+		cout<<"last wirte size: "<< total_packetSize-(total_packetNum-1)*1466<<endl;
                 }
-                //cout<<packet_map[current_token]<<endl;
-                //cout<<"write packet: "<<current_token<< ", Map size: "<<packet_map.size()<<endl;
 
-	            mtx.lock();
+                //cout<<packet_map[current_token]<<endl;
+                cout<<"write packet: "<<current_token<< ", Map size: "<<packet_map.size()<<endl;
+	//	char* deletp = packet_map(current_token);
+	        mtx.lock();
                 packet_map.erase(current_token);
                 mtx.unlock();
-
+		
                 current_token++;
-
+	//	delete deletp;
                 //cout<<"Next write: "<<current_token<< ", Value: "<<packet_map.count(current_token)<<endl;
 
             }else{
@@ -325,8 +341,8 @@ int write_resend_func_end(){
 }
 int main(int argc, char const *argv[]){
 
-    //char send_buffer[] = "get ./test.txt";
-    char send_buffer[] = "get ./data1.bin";
+    char send_buffer[] = "get ./test.txt";
+   // char send_buffer[] = "get ./data.bin";
     
 
     string fileName;
@@ -343,7 +359,7 @@ int main(int argc, char const *argv[]){
     client_send_address.sin_port = htons(SERVER_PORT);//9999
     //client_send_address.sin_addr.s_addr = INADDR_ANY;
     //inet_pton(AF_INET, "10.0.1.108", &client_send_address.sin_addr); 
-    inet_pton(AF_INET, "192.168.10.33", &client_send_address.sin_addr); 
+    inet_pton(AF_INET, "10.0.1.108", &client_send_address.sin_addr); 
  
 
     int numbytes = sendto(server_sockfd, send_buffer, sizeof(send_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
