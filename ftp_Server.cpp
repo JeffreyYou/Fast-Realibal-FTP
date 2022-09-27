@@ -251,7 +251,7 @@ int send_total_packet(){
         	set_token_all(token, main_tok);
             //sender_mx.unlock();
 
-        	char* this_buffer = (char*)malloc(1466);
+        	char* this_buffer = (char*)malloc(1472);
         	for(n=0; n<6; n++){
                 this_buffer[n] = main_tok[n];
             }
@@ -275,7 +275,7 @@ int send_total_packet(){
             //memset(MTU_1500, 0, sizeof(MTU_1500));
  
 
-	if(count_num>0 && count_num%200 ==0){
+	if(count_num>0 && count_num%170 ==0){
 	    //cout<<"--------------------Lock--------------------"<<endl;
 		unique_lock<mutex> lck(lk);
 		cv.wait(lck,shipment_available);
