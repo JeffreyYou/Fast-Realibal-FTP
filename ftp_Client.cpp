@@ -25,6 +25,7 @@ int server_sockfd;
 map<int,char*> packet_map;
 int current_token=0;
 int token_num=0;
+int max_token;
 
 char recv_buffer[1472];
 char file_name[100];
@@ -99,7 +100,7 @@ int resend_packet_write(int number){
 int store_packet_in_map(){
           
         int total_stored_packet=0;
-	int max_token=0;
+	max_token=0;
 	int buffer_full_num=0;
 	bool isSent = false;
 	ifstream udp_buffer;
@@ -127,9 +128,9 @@ int store_packet_in_map(){
 
     		      is_map_full = true;
             }
-	    //if(packet_map.size()>500000){
-	 //	      is_map_full = false;
-	    //}
+	    if(packet_map.size()>300000){
+	 	      is_map_full = false;
+	    }
 	    
 	   //if((token_num-max_token)>=1 ){
     	    //gettimeofday(&time1, NULL);
@@ -146,12 +147,11 @@ int store_packet_in_map(){
 		      string mystr1 = mystr.substr(2, 6);
 		      string mystr2 = temp.substr(found+43, 4);
 
-		//      cout<<"----mystr1.at(0):----:"<<mystr1.at(0)<<", remaining ignore: "<< buffer_full_num<<", is_map_full: "<<is_map_full<<endl;
-		      if(mystr1.at(0) == '0'){
+		      if(mystr1.at(0) == '0' && mystr1.at(1) < '3'){
 			if(mystr1.at(1) == '0' && mystr1.at(1) < '3'){
 				if(isSent == false) 	
 					is_map_full = true;
-		      	cout<<"----Normal buffer contains:----:"<<mystr1<<" bytes, Adding remaining ignore: "<< buffer_full_num<<", droped packet: "<<mystr2<<", map size: "<<packet_map.size()<<", recv token: "<<token_num<<endl;
+		      	cout<<"--UDP buffer:--:"<<mystr1<<", droped packet: "<<mystr2<<", map size: "<<packet_map.size()<<", recv token: "<<token_num<<", Writing packet: "<<current_token<<endl;
 		     	 }
 			//continue sending
 		      }else{
@@ -160,13 +160,13 @@ int store_packet_in_map(){
 		      	if(mystr1.at(0) == '1') buffer_full_num = 300;
 		      	if(mystr1.at(0) == '2') buffer_full_num = 500;
 		      	
-		      	cout<<"----Full buffer contains:----:"<<mystr1<<" bytes, Adding remaining ignore: "<< buffer_full_num<<", droped packet: "<<mystr2<<", map size: "<<packet_map.size()<<", recv token: "<<token_num<<endl;
+		     	cout<<"--UDP buffer full:--:"<<mystr1<<" bytes, Add compensate: "<< buffer_full_num<<", droped packet: "<<mystr2<<", map size: "<<packet_map.size()<<", recv token: "<<token_num<<", Writing packet: "<<current_token<<endl;
 		      }
 
 
 
 	    //}
-	   /* if(buffer_full_num !=0){
+	    if(buffer_full_num !=0){
 		buffer_full_num--;
 		      udp_buffer.open("/proc/net/udp");
 		      stringstream buf;
@@ -178,7 +178,7 @@ int store_packet_in_map(){
 		      string mystr4 = mystr.substr(2, 6);
 		      string mystr5 = temp.substr(found+43, 4);
 		cout<<"buffer_full_num: "<<buffer_full_num<<", buffer contains: "<<mystr4<<endl;
-	    }*/
+	    }
 	    if(buffer_full_num !=0) buffer_full_num--;
 	    if(max_token<token_num) max_token = token_num;
             number_store = max_token;
@@ -202,7 +202,7 @@ int store_packet_in_map(){
                    ptr[u] = recv_buffer[u];
                 }
                 pair<int,char*> p(token_num, ptr);
-               // cout<<"store: "<< token_num<<", total stored: "<<total_stored_packet<<", packet loss: "<<100*(double)(max_token-total_stored_packet)/(double)max_token<<"%"<<endl;
+                //cout<<"store: "<< token_num<<", total stored: "<<total_stored_packet<<", packet loss: "<<100*(double)(max_token-total_stored_packet)/(double)max_token<<"%"<<endl;
                 mtx.lock();
                 packet_map.insert(p);
                 mtx.unlock();
@@ -257,10 +257,14 @@ int write_packet_func(){
                 //cout<<"Next write: "<<current_token<< ", Value: "<<packet_map.count(current_token)<<endl;
 
             }else{
-	    
-                resend_packet(current_token);           
-
-                usleep(100);
+	        for(int s = current_token; s<(current_token+5000 < max_token ? current_token+50:max_token); s++){
+			if(s >= total_packetNum-1) break;
+			if(check_p[s] == false){
+				resend_packet(s);
+				resend_packet(s);
+			}
+		}
+                usleep(30);
 		
             }
         }
@@ -360,7 +364,8 @@ int write_resend_func_tostart(){
             }  
             iterator--;
         }
-        start = number_store;
+	if(current_token+1000<total_packetNum)
+        	start = current_token+1000;
         end = current_token;
         iterator = start;
     }
@@ -392,7 +397,8 @@ int write_resend_func_end(){
             }  
             iterator--;
         }
-        start = number_store;
+	if(current_token+1000<total_packetNum)
+                start = current_token+1000;
         end = current_token;
         iterator = start;
     }
@@ -466,27 +472,16 @@ int main(int argc, char const *argv[]){
 
     thread store_packet(store_packet_in_map);
     thread write_packet(write_packet_func);
-//   thread checker(write_resend_func_start);
-//    thread checker_end(write_resend_func_end);
-//   thread checker_middle_to_end(write_resend_func_middle_toend);
-//   thread checker_middle_to_start(write_resend_func_tostart);
-
-
 
     store_packet.join();
     write_packet.join();
-
-//   checker.join();
-//    checker_end.join();
-//    checker_middle_to_start.join();
-//   checker_middle_to_end.join();
 
     char finish_buffer[] = {'9','9','9','9','9','9','\0'};
     gettimeofday(&finish_time, NULL);
     
     cout<<"------------Trasmission Finish!----------------" << endl;
-    cout<<"Total time cost: "<<finish_time.tv_sec-start_time.tv_sec<<" s"<<endl;
-
+    cout<<"Total time cost: "<<finish_time.tv_sec-start_time.tv_sec<<" s"<<endl; 
+    cout<<"Transmission Speed: "<<(double)(1024*8)/(finish_time.tv_sec-start_time.tv_sec)<<" Mbps"<<endl;
 
     if(isFinish){
        int c = sendto(server_sockfd, finish_buffer, strlen(finish_buffer), 0, (struct sockaddr*)&client_send_address, sizeof(client_send_address));
@@ -499,9 +494,4 @@ int main(int argc, char const *argv[]){
     return 0;
 
 }
-
-// void ClientHandler(string s){
-//     out.open("myfile.txt", ios::app);
-//     out << str;
-// 
 

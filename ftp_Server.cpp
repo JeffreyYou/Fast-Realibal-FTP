@@ -121,7 +121,7 @@ int send_lost_packet(int resend_token){
 		//resend_map.insert(p);
 	}else{
 		resend_arr[resend_token]++;
-	       if(resend_arr[resend_token]%1000 == 0 ){
+	       if(resend_arr[resend_token]%5 == 0 ){
 				
 		}else{
 		//cout<<"stop"<<endl;
@@ -270,12 +270,12 @@ int send_total_packet(){
 	    }
 	   //system("cat /proc/net/udp");
 	    
-	    usleep(20);	    
+	    usleep(50);	    
             count_num++;
             //memset(MTU_1500, 0, sizeof(MTU_1500));
  
 
-	if(count_num>0 && count_num%170 ==0){
+	if(count_num>0 && count_num%150 ==0){
 	    //cout<<"--------------------Lock--------------------"<<endl;
 		unique_lock<mutex> lck(lk);
 		cv.wait(lck,shipment_available);
