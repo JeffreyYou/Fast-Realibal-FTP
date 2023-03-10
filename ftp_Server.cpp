@@ -43,41 +43,37 @@ map<int,int> resend_map;
 int* resend_arr;
 
 void set_token_all(int token , char* thistok){
-	    //convert token to char array of 00xxxx format.
-		int tok_len = 6;
-
-
-	    string count_str;
-	    count_str = to_string(token);
-	    tok_len = tok_len-count_str.length();
-	    while(tok_len != 0){
-	        count_str = "0" + count_str;
-	        tok_len = tok_len - 1;
-	    }
-	    tok_len = 6;
-	    strcpy(thistok, count_str.c_str());
+    //convert token to char array of 00xxxx format.
+    int tok_len = 6;
+    string count_str;
+    count_str = to_string(token);
+    tok_len = tok_len-count_str.length();
+    while(tok_len != 0){
+        count_str = "0" + count_str;
+        tok_len = tok_len - 1;
+    }
+    tok_len = 6;
+    strcpy(thistok, count_str.c_str());
 
 }
 void set_token_resend(int token , char* thistok){
-	    //convert token to char array of 00xxxx format.
-		int tok_len = 6;
+    //convert token to char array of 00xxxx format.
+    int tok_len = 6;
 
 
-	    string count_str;
-	    count_str = to_string(token);
-	    tok_len = tok_len-count_str.length();
-	    while(tok_len != 0){
-	        count_str = "0" + count_str;
-	        tok_len = tok_len - 1;
-	    }
-	    tok_len = 6;
-	    strcpy(thistok, count_str.c_str());
+    string count_str;
+    count_str = to_string(token);
+    tok_len = tok_len-count_str.length();
+    while(tok_len != 0){
+        count_str = "0" + count_str;
+        tok_len = tok_len - 1;
+    }
+    tok_len = 6;
+    strcpy(thistok, count_str.c_str());
 
 }
 
 int client_send_name(){
-
-		
 	if(recv_buffer[0] == 'g' && recv_buffer[1] == 'e' && recv_buffer[2] == 't'){
 		char *p = strchr(recv_buffer, ' ')+1;	
 		strcpy(file_name, p);
@@ -89,34 +85,34 @@ int client_send_name(){
 	}	
 	return 0;
 }
+
 int client_send_packet_num(int total_packet){
-		char packet_num_buffer[100];
-		string packet_num_str = to_string(total_packet);
-		strcpy(packet_num_buffer, packet_num_str.c_str());
+    char packet_num_buffer[100];
+    string packet_num_str = to_string(total_packet);
+    strcpy(packet_num_buffer, packet_num_str.c_str());
 
-		int n = sendto(server_socket, packet_num_buffer, strlen(packet_num_buffer),0,(struct sockaddr*)&client_address, sizeof(client_address));
-		if(n<0) cout<< "Server failed to send packet number to client" <<endl;				
-	    
-	    return 0;
+    int n = sendto(server_socket, packet_num_buffer, strlen(packet_num_buffer),0,(struct sockaddr*)&client_address, sizeof(client_address));
+    if(n<0) cout<< "Server failed to send packet number to client" <<endl;
 
+    return 0;
 }
+
 int client_send_packet_size(int total_packet_size){
-		char packet_size_buffer[100];
-		string packet_size_str = to_string(total_packet_size);
-		strcpy(packet_size_buffer, packet_size_str.c_str());
-		//cout<<"packet_size_buffer: "<< packet_size_buffer<<endl;
-		int n = sendto(server_socket, packet_size_buffer, strlen(packet_size_buffer),0,(struct sockaddr*)&client_address, sizeof(client_address));
-		if(n<0) cout<< "Server failed to send packet number to client" <<endl;				
-	    
-	    return 0;
-
+    char packet_size_buffer[100];
+    string packet_size_str = to_string(total_packet_size);
+    strcpy(packet_size_buffer, packet_size_str.c_str());
+    //cout<<"packet_size_buffer: "<< packet_size_buffer<<endl;
+    int n = sendto(server_socket, packet_size_buffer, strlen(packet_size_buffer),0,(struct sockaddr*)&client_address, sizeof(client_address));
+    if(n<0) cout<< "Server failed to send packet number to client" <<endl;
+    return 0;
 }
+
 int send_lost_packet(int resend_token){
-		if(MTU1500) char MTU_1500[1472];
-        if(MTU9001) char MTU_9001[8973];
-	    int no_packet;
-	    int count = 0;
-	    int seek;
+    if(MTU1500) char MTU_1500[1472];
+    if(MTU9001) char MTU_9001[8973];
+    int no_packet;
+    int count = 0;
+    int seek;
 	
 	
 	
@@ -132,48 +128,46 @@ int send_lost_packet(int resend_token){
 		//cout<<"stop"<<endl;
 		return 0;
 		}       
-	     }
-	
-	
-	    ifstream myfile;
-	    string input = file_name;
+    }
+    ifstream myfile;
+    string input = file_name;
 
-	    myfile.open(input,ios::binary | ios::in);
-        if(MTU1500) seek = resend_token*(1472-6);
-        if(MTU9001) seek = resend_token*(8973-6);
-        myfile.seekg(seek,ios::beg);
-		 //MTU_1500 = tok + packet;
-        if(MTU1500) myfile.read(MTU_1500+6, 1466);
-        if(MTU9001) myfile.read(MTU_1500+6, 8967);
+    myfile.open(input,ios::binary | ios::in);
+    if(MTU1500) seek = resend_token*(1472-6);
+    if(MTU9001) seek = resend_token*(8973-6);
+    myfile.seekg(seek,ios::beg);
+     //MTU_1500 = tok + packet;
+    if(MTU1500) myfile.read(MTU_1500+6, 1466);
+    if(MTU9001) myfile.read(MTU_1500+6, 8967);
 
-        char mytok[6];
-        memset(mytok, 0, sizeof(mytok));
+    char mytok[6];
+    memset(mytok, 0, sizeof(mytok));
 
-        //sender_mx.lock();
-        set_token_resend(resend_token, mytok);
-        //sender_mx.unlock();
+    //sender_mx.lock();
+    set_token_resend(resend_token, mytok);
+    //sender_mx.unlock();
 
-        for(int x=0; x<6; x++){
-            if(MTU1500) MTU_1500[x] = mytok[x];
-            if(MTU9001) MTU_9001[x] = mytok[x];
-        }
-        //cout<< "file read finish:"<< resend_token<<endl;
-        //sender_mx.lock();
-        //cout<< "go to sendto:"<< resend_token<<endl;
-        int n;
-        if(MTU1500)
-            n = sendto(server_socket, MTU_1500, 1472, 0,(struct sockaddr*)&client_address, sizeof(client_address));
-        if(MTU9001)
-            n = sendto(server_socket, MTU_9001, 8973, 0,(struct sockaddr*)&client_address, sizeof(client_address));
+    for(int x=0; x<6; x++){
+        if(MTU1500) MTU_1500[x] = mytok[x];
+        if(MTU9001) MTU_9001[x] = mytok[x];
+    }
+    //cout<< "file read finish:"<< resend_token<<endl;
+    //sender_mx.lock();
+    //cout<< "go to sendto:"<< resend_token<<endl;
+    int n;
+    if(MTU1500)
+        n = sendto(server_socket, MTU_1500, 1472, 0,(struct sockaddr*)&client_address, sizeof(client_address));
+    if(MTU9001)
+        n = sendto(server_socket, MTU_9001, 8973, 0,(struct sockaddr*)&client_address, sizeof(client_address));
 
-        //sender_mx.unlock();
-        //	cout<<"---Resend success: "<<resend_token<<endl;
-	    //	cout<<"send bytes: "<< n<<endl;
-		if(n<0) cout<< "Server failed resend packet: " <<resend_token<<endl;
+    //sender_mx.unlock();
+    //	cout<<"---Resend success: "<<resend_token<<endl;
+    //	cout<<"send bytes: "<< n<<endl;
+    if(n<0) cout<< "Server failed resend packet: " <<resend_token<<endl;
 
-        if(MTU1500) memset(MTU_1500, 0, sizeof(MTU_1500));
-        if(MTU9001) memset(MTU_9001, 0, sizeof(MTU_9001));
-        return 0;
+    if(MTU1500) memset(MTU_1500, 0, sizeof(MTU_1500));
+    if(MTU9001) memset(MTU_9001, 0, sizeof(MTU_9001));
+    return 0;
 }
 
 // ------------------------Listen-----------------------
@@ -251,14 +245,14 @@ int send_total_packet(){
 	client_send_packet_size(file_size);
 
 	myfile.seekg(0, ios::beg);
-        int k = 0;
-   
-        //no_packet = 1024^3 / (1472-6) + 1;
-        while(count_num < total_packet){
+    int k = 0;
 
-        	//sender_mx.lock();
-        	set_token_all(token, main_tok);
-            //sender_mx.unlock();
+    //no_packet = 1024^3 / (1472-6) + 1;
+    while(count_num < total_packet){
+
+        //sender_mx.lock();
+        set_token_all(token, main_tok);
+        //sender_mx.unlock();
 //            if(MTU1500) char* this_buffer = (char*)malloc(1472);
 //            if(MTU9001) char* this_buffer = (char*)malloc(8973);
 //
@@ -267,50 +261,49 @@ int send_total_packet(){
 //            }
 //            token++;
 
-            if(MTU1500) {
-                char* this_buffer = (char*)malloc(1472);
-                for(n=0; n<6; n++){
-                this_buffer[n] = main_tok[n];
-                }
-                token++;
-                myfile.read(this_buffer+6, 1466);
-                n = sendto(server_socket, this_buffer, 1472,0,(struct sockaddr*)&client_address, sizeof(client_address));
-                free(this_buffer);
+        if(MTU1500) {
+            char* this_buffer = (char*)malloc(1472);
+            for(n=0; n<6; n++){
+            this_buffer[n] = main_tok[n];
             }
-            if(MTU9001) {
-                char* this_buffer = (char*)malloc(8973);
-                for(n=0; n<6; n++){
-                this_buffer[n] = main_tok[n];
-                }
-                token++;
-                myfile.read(this_buffer+6, 8967);
-                n = sendto(server_socket, this_buffer, 8973,0,(struct sockaddr*)&client_address, sizeof(client_address));
-                free(this_buffer);
+            token++;
+            myfile.read(this_buffer+6, 1466);
+            n = sendto(server_socket, this_buffer, 1472,0,(struct sockaddr*)&client_address, sizeof(client_address));
+            free(this_buffer);
+        }
+        if(MTU9001) {
+            char* this_buffer = (char*)malloc(8973);
+            for(n=0; n<6; n++){
+            this_buffer[n] = main_tok[n];
             }
-            //n = sendto(server_socket, MTU_1500, strlen(MTU_1500),0,(struct sockaddr*)&client_address, sizeof(client_address));
-            //free(this_buffer);
-	        if(n>0){
-            	cout<<"Normal sending packet No."<<count_num<<", packet size: "<<n<<endl;
-	        }else{
-                cout<<"Failed to Send packet No."<<count_num<<endl;
-	        }
+            token++;
+            myfile.read(this_buffer+6, 8967);
+            n = sendto(server_socket, this_buffer, 8973,0,(struct sockaddr*)&client_address, sizeof(client_address));
+            free(this_buffer);
+        }
+        //n = sendto(server_socket, MTU_1500, strlen(MTU_1500),0,(struct sockaddr*)&client_address, sizeof(client_address));
+        //free(this_buffer);
+        if(n>0){
+            cout<<"Normal sending packet No."<<count_num<<", packet size: "<<n<<endl;
+        }else{
+            cout<<"Failed to Send packet No."<<count_num<<endl;
+        }
 	   //system("cat /proc/net/udp");
 	    
-	        usleep(50);
-            count_num++;
-            //memset(MTU_1500, 0, sizeof(MTU_1500));
+        usleep(50);
+        count_num++;
+        //memset(MTU_1500, 0, sizeof(MTU_1500));
  
 
-	if(count_num>0 && count_num%150 ==0){
-		unique_lock<mutex> lck(lk);
-		cv.wait(lck,shipment_available);
-		//usleep(500);
-		cargo = 0;
-	    }
-            
+	    if(count_num>0 && count_num%150 ==0){
+            unique_lock<mutex> lck(lk);
+            cv.wait(lck,shipment_available);
+            //usleep(500);
+            cargo = 0;
         }
+            
+    }
     //cout<<"Main send close."<<endl;
-    
     myfile.close();
 	return 0;
 }
@@ -320,8 +313,8 @@ int main(int argc, char const *argv[])
 {
     if(argv[1][0] == '1') MTU1500 = true;
     if(argv[1][0] == '9') MTU9001 = true;
-//    cout<<"MTU1500: "<< MTU1500<<endl;
-//    cout<<"MTU9001: "<< MTU9001<<endl;
+    //cout<<"MTU1500: "<< MTU1500<<endl;
+    //cout<<"MTU9001: "<< MTU9001<<endl;
 
 
 	bzero(recv_buffer, sizeof(recv_buffer));

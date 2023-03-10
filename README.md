@@ -1,33 +1,28 @@
-# Simple_FTP
+Fast_Realible_FTP
 
-## 1. Online Resources
+This file transfer protocol uses multi-thread to reliably transfer files from server to client over UDP, optimizing for performance under high-congestion and high-loss conditions.
 
-### 1.1 Linux版：
+## Instruction
 
-文字教程
+server.cpp:
 
-[Linux FTP服务器与客户端（FTP命令 C/C++代码实现）](https://blog.csdn.net/chen1415886044/article/details/125249505)
+- Compile: `g++ -std=c++11 -g -pthread ftp_Server.cpp -o server`
 
-GitHub项目
+- Run: `./<target_file_name> <file_to_transfer> <host_port>`
 
-[C语言实现FTP （有源码）](https://github.com/thevickypedia/ftp_server_client)
+- Makefile shortcut:
 
-### 1.2 Windows版(仅参考):
+  `make server`
 
-文字教程
+client.cpp:
 
-[C/C++实现ftp客户端源码](https://www.sindsun.com/articles/16/137)
+- Description:
 
-[C++的简单FTP客户端实现](https://blog.csdn.net/xuruilll/article/details/122763005)
+- Compile: `g++ -std=c++11 -g -pthread ftp_Client.cpp -o client`
 
-视频教程
+- Run: `./<target_file_name> <path_to_store_file> <hostname> <host_port>`
 
-[【C/C++项目开发】使用FTP传输文件到服务器，实现简单通信](https://www.bilibili.com/video/BV1HA411N7Q7?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=36f6248a8f8f91f7f222d6009428db8c)
+- Makefile shortcut:
 
-## 2. FTP Server
+  `make client`
 
-[server.c](https://github.com/thevickypedia/ftp_server_client/blob/master/server.c)
-
-## 3. FTP Client
-
-[client.c](https://github.com/thevickypedia/ftp_server_client/blob/master/client.c)
