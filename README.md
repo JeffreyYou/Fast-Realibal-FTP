@@ -1,4 +1,4 @@
-# Fast_Realible_FTP
+# Fast and Reliable File Transfer Protocol
 
 This file transfer protocol uses multi-thread to reliably transfer files from server to client over UDP, optimizing for performance under high-congestion and high-loss conditions.
 
