@@ -1,10 +1,13 @@
 # Fast and Reliable File Transfer Protocol
 
-This file transfer protocol uses multi-thread to reliably transfer files from server to client over UDP, optimizing for performance under high-congestion and high-loss conditions.
+This a **UDP-based** file transfer protocol.
+It uses multi-thread to reliably transfer files from server to client, with a very good performance under the high-congestion and high-loss conditions.
 
-## Instruction
-
+## Quick Start
+### Server Setup
 server.cpp:
+
+- Description: The server waiting for the transmission
 
 - Compile: `g++ -std=c++11 -g -pthread ftp_Server.cpp -o server`
 
@@ -14,9 +17,11 @@ server.cpp:
 
   `make server`
 
+### Client Setup
+
 client.cpp:
 
-- Description:
+- Description: The client that sends the file
 
 - Compile: `g++ -std=c++11 -g -pthread ftp_Client.cpp -o client`
 
@@ -26,3 +31,8 @@ client.cpp:
 
   `make client`
 
+### File Integrity Check
+MD5.py:
+- Description: Generate the hash code of transferred file.
+  
+- Run: `python MD5.py`
