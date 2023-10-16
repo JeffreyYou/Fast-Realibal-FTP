@@ -9,8 +9,6 @@ This **UDP-based** file transfer protocol solves the problem.
 
 It employs multi-threading to ensure reliable file transfers from server to client, delivering excellent performance even in high-congestion and high-loss network conditions.
 
-Changes made:
-
 ## Quick Start
 ### Server Setup
 server.cpp:
