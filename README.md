@@ -5,9 +5,11 @@ The traditional FTP protocol performs well under most circumstances.
 
 However, when the network environment is poor, its performance deteriorates significantly. Since TCP-based FTP uses an exponential back-off mechanism, it decreases the transmission rate when it assumes the network link is congested,
 
-This is a **UDP-based** file transfer protocol.
+This **UDP-based** file transfer protocol solves the problem.
 
-It uses multi-thread to reliably transfer files from server to client, with a very good performance under the high-congestion and high-loss conditions.
+It employs multi-threading to ensure reliable file transfers from server to client, delivering excellent performance even in high-congestion and high-loss network conditions.
+
+Changes made:
 
 ## Quick Start
 ### Server Setup
