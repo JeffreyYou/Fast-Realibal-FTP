@@ -1,13 +1,19 @@
 # Fast and Reliable File Transfer Protocol
+## Why This
 
-This a **UDP-based** file transfer protocol.
+The traditional FTP protocol performs well under most circumstances.
+
+However, when the network environment is poor, its performance deteriorates significantly. Since TCP-based FTP uses an exponential back-off mechanism, it decreases the transmission rate when it assumes the network link is congested,
+
+This is a **UDP-based** file transfer protocol.
+
 It uses multi-thread to reliably transfer files from server to client, with a very good performance under the high-congestion and high-loss conditions.
 
 ## Quick Start
 ### Server Setup
 server.cpp:
 
-- Description: The server waiting for the transmission
+- Description: The server waiting for the transmission.
 
 - Compile: `g++ -std=c++11 -g -pthread ftp_Server.cpp -o server`
 
@@ -21,7 +27,7 @@ server.cpp:
 
 client.cpp:
 
-- Description: The client that sends the file
+- Description: The client that establish connection with server and sends the file.
 
 - Compile: `g++ -std=c++11 -g -pthread ftp_Client.cpp -o client`
 
