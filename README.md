@@ -1,13 +1,14 @@
 # Fast and Reliable File Transfer Protocol
 ## Why This
+### Traditional FTP
+The traditional FTP protocol is efficient in most scenarios. 
 
-The traditional FTP protocol performs well under most circumstances.
+However, when faced with an unstable network environment, its efficacy wanes considerably. This is largely due to the TCP-based FTP's exponential back-off mechanism, which curtails the transmission rate upon detecting network congestion
 
-However, when the network environment is poor, its performance deteriorates significantly. Since TCP-based FTP uses an exponential back-off mechanism, it decreases the transmission rate when it assumes the network link is congested,
+### UDP-based FTP
+This **UDP-based** file transfer protocol is an alternative solution.
 
-This **UDP-based** file transfer protocol solves the problem.
-
-It employs multi-threading to ensure reliable file transfers from server to client, delivering excellent performance even in high-congestion and high-loss network conditions.
+Leveraging multi-threading, this protocol guarantees dependable file transfers between server and client, delivering excellent performance even in high-congestion and high-loss network conditions.
 
 ## Quick Start
 ### Server Setup
